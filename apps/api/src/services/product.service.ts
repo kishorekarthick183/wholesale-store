@@ -2,14 +2,16 @@ import { prisma } from "@wholesale/db";
 import { ApiError } from "../errors/api-error.js";
 import type { Product } from "@wholesale/types";
 
-export async function getProducts(): Promise<Product[]> {
-    const products = await prisma.product.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
-
-    return products.map((product) => ({
+function toProductResponse(product: {
+    id: string;
+    name: string;
+    description: string | null;
+    price: { toString(): string };
+    stock: number;
+    createdAt: Date;
+    updatedAt: Date;
+}): Product {
+    return {
         id: product.id,
         name: product.name,
         description: product.description,
@@ -17,7 +19,17 @@ export async function getProducts(): Promise<Product[]> {
         stock: product.stock,
         createdAt: product.createdAt.toISOString(),
         updatedAt: product.updatedAt.toISOString(),
-    }));
+    };
+}
+
+export async function getProducts(): Promise<Product[]> {
+    const products = await prisma.product.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+
+    return products.map(toProductResponse);
 }
 
 export async function createProduct(data: {
@@ -27,15 +39,7 @@ export async function createProduct(data: {
     stock: number;
 }) : Promise<Product> {
     const product = await prisma.product.create({ data });
-    return {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price.toString(),
-        stock: product.stock,
-        createdAt: product.createdAt.toISOString(),
-        updatedAt: product.updatedAt.toISOString(),
-    }
+    return toProductResponse(product);
 }
 
 export async function updateProduct(
