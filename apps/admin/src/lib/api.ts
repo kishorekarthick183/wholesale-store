@@ -23,7 +23,8 @@ export async function getProducts(): Promise<Product[]> {
         throw new Error("Failed to fetch products");
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
 }
 
 export async function createProduct(
@@ -41,7 +42,8 @@ export async function createProduct(
         throw new Error("Failed to create product");
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
 }
 
 export async function deleteProduct(id: string): Promise<void> {
@@ -70,5 +72,6 @@ export async function updateProduct(
         throw new Error("Failed to update product");
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.data;
 }
