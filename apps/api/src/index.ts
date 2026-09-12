@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { prisma } from "@wholesale/db";
 import { createProductSchema } from "./validation/products.js";
+import { getProducts, createProduct, updateProduct, deleteProduct } from "./services/product.service.js";
 
 const app = express();
 
@@ -19,9 +20,7 @@ app.get("/health", async (_, res) => {
 
 app.get("/products", async (_req, res) => {
     try {
-        const products = await prisma.product.findMany({
-            orderBy: {createdAt: "desc"},
-        });
+        const products = await getProducts();
         res.json(products);
     } catch (error) {
         console.error(error);
@@ -41,9 +40,7 @@ app.post("/products", async (req, res) => {
             return;
         }
 
-        const product = await prisma.product.create({
-            data: result.data
-        });
+        const product = await createProduct(result.data);
         res.status(201).json(product);
     } catch (error) {
         console.log(error);
@@ -62,12 +59,7 @@ app.put("/products/:id", async (req, res) => {
             return;
         }
 
-        const product = await prisma.product.update({
-            where: {
-                id: req.params.id,
-            },
-            data: result.data
-        });
+        const product = await updateProduct(req.params.id, result.data);
         res.json(product);
     } catch(error) {   
         console.error(error);
@@ -79,11 +71,7 @@ app.put("/products/:id", async (req, res) => {
 
 app.delete("/products/:id", async (req, res) => {
     try {
-        await prisma.product.delete({
-            where: {
-                id: req.params.id,
-            }
-        });
+        await deleteProduct(req.params.id);
         res.json(204).send();
     } catch (error) {
         console.error(error);
