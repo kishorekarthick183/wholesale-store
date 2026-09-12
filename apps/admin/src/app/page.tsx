@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { createProduct, getProducts } from "@/lib/api";
-import { ApiError } from "next/dist/server/api-utils";
+import { createProduct, getProducts, deleteProduct } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -59,6 +58,18 @@ export default function Home() {
             }
         } finally {
             setSubmitting(false);
+        }
+    }
+    
+    async function handleDelete(id :string) {
+        setError(null);
+
+        try {
+            await deleteProduct(id);
+
+            setProducts((current) => current.filter((product) => product.id !== id));
+        } catch (error) {
+            setError("Failed to delete product");
         }
     }
 
@@ -164,6 +175,15 @@ export default function Home() {
 
                             <p>Price: ₹{product.price}</p>
                             <p>Stock: {product.stock}</p>
+                            <p>Stock: {product.stock}</p>
+
+                            <button
+                                type="button"
+                                onClick={() => handleDelete(product.id)}
+                                className="mt-2 rounded bg-red-600 px-3 py-1 text-white"
+                            >
+                                Delete
+                            </button>
                         </div>
                     ))}
                 </div>
