@@ -1,102 +1,100 @@
-import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+"use client";
 
-type Props = Omit<ImageProps, "src"> & {
-  srcLight: string;
-  srcDark: string;
-};
-
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
-
-  return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
+import { useEffect, useState } from "react";
+import type { Product } from "@wholesale/types";
+import { getProducts } from "../lib/api";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ThemeImage
-          className={styles.logo}
-          srcLight="turborepo-dark.svg"
-          srcDark="turborepo-light.svg"
-          alt="Turborepo logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [cart, setCart] = useState<Product[]>([]);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new/clone?demo-description=Learn+to+implement+a+monorepo+with+a+two+Next.js+sites+that+has+installed+three+local+packages.&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F4K8ZISWAzJ8X1504ca0zmC%2F0b21a1c6246add355e55816278ef54bc%2FBasic.png&demo-title=Monorepo+with+Turborepo&demo-url=https%3A%2F%2Fexamples-basic-web.vercel.sh%2F&from=templates&project-name=Monorepo+with+Turborepo&repository-name=monorepo-turborepo&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fturborepo%2Ftree%2Fmain%2Fexamples%2Fbasic&root-directory=apps%2Fdocs&skippable-integrations=1&teamSlug=vercel&utm_source=create-turbo"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://turborepo.dev/docs?utm_source"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com/templates?search=turborepo&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://turborepo.dev?utm_source=create-turbo"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to turborepo.dev →
-        </a>
-      </footer>
-    </div>
-  );
+    function addToCart(product: Product) {
+        setCart((current) => [...current, product]);
+    }
+
+    useEffect(() => {
+        async function fetchProducts() {
+            try {
+                const data = await getProducts();
+
+                setProducts(data);
+            } catch {
+                setError("Failed to load products");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchProducts();
+    }, []);
+
+    if (loading) {
+        return (
+            <main className="p-8">
+                Loading products...
+            </main>
+        );
+    }
+
+    if (error) {
+        return (
+            <main className="p-8">
+                <p className="text-red-600">{error}</p>
+            </main>
+        );
+    }
+
+    return (
+        <main className="p-8">
+            <div className="mb-6 flex items-center justify-between">
+                <h1 className="text-3xl font-bold">
+                    Wholesale Store
+                </h1>
+
+                <p className="font-medium">
+                    Cart: {cart.length}
+                </p>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {products.map((product) => (
+                    <div
+                        key={product.id}
+                        className="rounded-lg border p-4 flex flex-col justify-between"
+                    >
+                        <div>
+                            <h2 className="text-lg font-semibold">
+                                {product.name}
+                            </h2>
+
+                            {product.description && (
+                                <p className="mt-2 text-gray-600">
+                                    {product.description}
+                                </p>
+                            )}
+
+                            <p className="mt-4 font-medium">
+                                ₹{product.price}
+                            </p>
+
+                            <p className="text-sm text-gray-500">
+                                {product.stock} in stock
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => addToCart(product)}
+                            disabled={product.stock === 0}
+                            className="mt-4 rounded bg-black px-4 py-2 text-white disabled:opacity-50 w-full"
+                        >
+                            {product.stock === 0 ? "Out of stock" : "Add to Cart"}
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </main>
+    );
 }
