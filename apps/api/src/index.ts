@@ -40,7 +40,7 @@ app.post("/products", async (req, res) => {
             });
             return;
         }
-        
+
         const product = await prisma.product.create({
             data: result.data
         });
@@ -48,6 +48,32 @@ app.post("/products", async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "failed to create product" });
+    }
+});
+
+app.put("/products/:id", async (req, res) => {
+    try {
+        const result = createProductSchema.safeParse(req.body);
+        if (!result.success) {
+            res.status(400).json({
+                error: "Invalid product data",
+                details: result.error.issues,
+            });
+            return;
+        }
+
+        const product = await prisma.product.update({
+            where: {
+                id: req.params.id,
+            },
+            data: result.data
+        });
+        res.json(product);
+    } catch(error) {   
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to update product",
+        });
     }
 });
 
