@@ -29,6 +29,16 @@ export async function updateProduct(
         stock: number;
     },
 ) {
+     const product = await prisma.product.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if (!product) {
+        throw new ApiError(404, "Product not found");
+    }
+
     return prisma.product.update({
         where: {
             id,
@@ -38,6 +48,16 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: string) {
+    const product = await prisma.product.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if (!product) {
+        throw new ApiError(404, "Product not found");
+    }
+    
     return prisma.product.delete({
         where: {
             id,
