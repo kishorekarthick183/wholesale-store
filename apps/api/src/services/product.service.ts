@@ -25,10 +25,17 @@ export async function createProduct(data: {
     description?: string;
     price: number;
     stock: number;
-}) {
-    return prisma.product.create({
-        data,
-    });
+}) : Promise<Product> {
+    const product = await prisma.product.create({ data });
+    return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price.toString(),
+        stock: product.stock,
+        createdAt: product.createdAt.toISOString(),
+        updatedAt: product.updatedAt.toISOString(),
+    }
 }
 
 export async function updateProduct(
