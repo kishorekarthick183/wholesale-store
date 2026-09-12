@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
 import { createProduct, getProducts } from "@/lib/api";
+import { ApiError } from "next/dist/server/api-utils";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -32,7 +33,7 @@ export default function Home() {
     }, []);
 
     async function handleSubmit(
-        event: React.FormEvent<HTMLFormElement>
+        event: React.SubmitEvent<HTMLFormElement>
     ) {
         event.preventDefault();
         setError(null);
@@ -50,8 +51,12 @@ export default function Home() {
             setDescription("");
             setPrice("");
             setStock("");
-        } catch {
-            setError("Failed to create product");
+        } catch(error) {
+            if (error instanceof Error) {
+                setError(error.message)
+            } else {
+                setError("An unexpected error occurred");
+            }
         } finally {
             setSubmitting(false);
         }

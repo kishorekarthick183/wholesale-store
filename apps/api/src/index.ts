@@ -3,10 +3,16 @@ import express from "express";
 import { errorHandler } from "./middleware/error-handler.js";
 import productRoutes from "./routes/product.routes.js";
 import healthRoutes from "./routes/health.routes.js";
+import cors from "cors";
 
 const app = express();
 
 app.use(express.json());
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+    }),
+);
 
 app.use("/health", healthRoutes);
 app.use("/products", productRoutes);
