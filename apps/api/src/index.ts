@@ -1,10 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import { prisma } from "@wholesale/db";
-import { createProductSchema, updateProductSchema } from "./validation/product.js";
-import { getProducts, createProduct, updateProduct, deleteProduct } from "./services/product.service.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import "express-async-errors";
+import productRoutes from "../src/routes/product.routes.js";
 
 const app = express();
 
@@ -15,44 +14,7 @@ app.get("/health", async (_, res) => {
     res.json({status: "ok", database: "connected"});
 });
 
-app.get("/products", async (_req, res) => {
-    const products = await getProducts();
-    res.json(products);
-});
-
-app.post("/products", async (req, res) => {
-    const result = createProductSchema.safeParse(req.body);
-
-    if (!result.success) {
-        res.status(400).json({
-            error: "Invalid product data",
-            details: result.error.issues,
-        });
-        return;
-    }
-
-    const product = await createProduct(result.data);
-    res.status(201).json(product);
-});
-
-app.put("/products/:id", async (req, res) => {
-    const result = updateProductSchema.safeParse(req.body);
-    if (!result.success) {
-        res.status(400).json({
-            error: "Invalid product data",
-            details: result.error.issues,
-        });
-        return;
-    }
-
-    const product = await updateProduct(req.params.id, result.data);
-    res.json(product);
-});
-
-app.delete("/products/:id", async (req, res) => {
-    await deleteProduct(req.params.id);
-    res.status(204).send();
-})
+app.use("/products", productRoutes);
 
 app.use(errorHandler);
 
