@@ -1,0 +1,78 @@
+import { prisma } from "@wholesale/db";
+import { ApiError } from "../errors/api-error.js";
+import type { CreateOrderInput } from "../validation/order.js";
+
+export async function createOrder(data: CreateOrderInput) {
+    return prisma.$transaction(async (tx) => {
+        // Choose particular products based on order id in orders
+        // If not found in prisma will return null
+        const products = await Promise.all(
+            data.items.map((item) =>
+                tx.product.findUnique({
+                    where: {
+                        id: item.productId,
+                    },
+                }),
+            ),
+        );
+
+        for (let i = 0; i < products.length; i++) {
+            const product = products[i];
+            const item = data.items[i];
+
+            if (!product) {
+                throw new ApiError(404, "Product not found");
+            }
+
+            if (product.stock < item.quantity) {
+                throw new ApiError(
+                    400,
+                    `Insufficient stock for ${product.name}`,
+                );
+            }
+        }
+
+        let total = 0;
+
+        const orderItems = data.items.map((item, index) => {
+            const product = products[index]!;
+
+            total += Number(product.price) * item.quantity;
+
+            return {
+                productId: product.id,
+                quantity: item.quantity,
+                price: product.price,
+            };
+        });
+
+        const order = await tx.order.create({
+            data: {
+                name: data.name,
+                phone: data.phone,
+                total,
+                items: {
+                    create: orderItems,
+                },
+            },
+            include: {
+                items: true,
+            },
+        });
+
+        for (const item of data.items) {
+            await tx.product.update({
+                where: {
+                    id: item.productId,
+                },
+                data: {
+                    stock: {
+                        decrement: item.quantity,
+                    },
+                },
+            });
+        }
+
+        return order;
+    });
+}

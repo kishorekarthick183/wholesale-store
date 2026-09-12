@@ -3,6 +3,7 @@ import express from "express";
 import { errorHandler } from "./middleware/error-handler.js";
 import productRoutes from "./routes/product.routes.js";
 import healthRoutes from "./routes/health.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 import cors from "cors";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(
 
 app.use("/health", healthRoutes);
 app.use("/products", productRoutes);
+app.use("/orders", orderRoutes);
 
 app.use(errorHandler);
 
