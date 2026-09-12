@@ -43,6 +43,34 @@ export default function Home() {
         });
     }
 
+    function increaseQuantity(productId: string) {
+        setCart((current) =>
+            current.map((item) =>
+                item.product.id === productId
+                    ? {
+                        ...item,
+                        quantity: item.quantity + 1,
+                    }
+                    : item,
+            ),
+        );
+    }
+
+    function decreaseQuantity(productId: string) {
+        setCart((current) =>
+            current
+                .map((item) =>
+                    item.product.id === productId
+                        ? {
+                            ...item,
+                            quantity: item.quantity - 1,
+                        }
+                        : item,
+                )
+                .filter((item) => item.quantity > 0),
+        );
+    }
+
     useEffect(() => {
         async function fetchProducts() {
             try {
@@ -138,7 +166,7 @@ export default function Home() {
                     </p>
                 ) : (
                     <div className="space-y-3">
-                        {cart.map((item) => (
+                       {cart.map((item) => (
                             <div
                                 key={item.product.id}
                                 className="flex items-center justify-between rounded-lg border p-4"
@@ -149,15 +177,43 @@ export default function Home() {
                                     </p>
 
                                     <p className="text-sm text-gray-500">
-                                        ₹{item.product.price} × {item.quantity}
+                                        ₹{item.product.price} each
                                     </p>
                                 </div>
 
-                                <p className="font-medium">
-                                    ₹
-                                    {Number(item.product.price) *
-                                        item.quantity}
-                                </p>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                decreaseQuantity(item.product.id)
+                                            }
+                                            className="h-8 w-8 rounded border"
+                                        >
+                                            −
+                                        </button>
+
+                                        <span className="w-6 text-center">
+                                            {item.quantity}
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                increaseQuantity(item.product.id)
+                                            }
+                                            className="h-8 w-8 rounded border"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+
+                                    <p className="w-24 text-right font-medium">
+                                        ₹
+                                        {Number(item.product.price) *
+                                            item.quantity}
+                                    </p>
+                                </div>
                             </div>
                         ))}
                     </div>
