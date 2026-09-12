@@ -46,8 +46,8 @@ export async function updateProduct(
         price: number;
         stock: number;
     },
-) {
-     const product = await prisma.product.findUnique({
+) : Promise<Product> {
+    const product = await prisma.product.findUnique({
         where: {
             id,
         },
@@ -57,12 +57,22 @@ export async function updateProduct(
         throw new ApiError(404, "Product not found");
     }
 
-    return prisma.product.update({
+    const updatedProduct = await prisma.product.update({
         where: {
             id,
         },
         data,
     });
+
+    return {
+        id: updatedProduct.id,
+        name: updatedProduct.name,
+        description: updatedProduct.description,
+        price: updatedProduct.price.toString(),
+        stock: updatedProduct.stock,
+        createdAt: updatedProduct.createdAt.toISOString(),
+        updatedAt: updatedProduct.updatedAt.toISOString(),
+    }
 }
 
 export async function deleteProduct(id: string) {
