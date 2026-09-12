@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { createProduct, getProducts, deleteProduct } from "@/lib/api";
+import { createProduct, getProducts, deleteProduct, updateProduct } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -15,6 +15,12 @@ export default function Home() {
     const [stock, setStock] = useState("");
 
     const [submitting, setSubmitting] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+
+    const [editName, setEditName] = useState("");
+    const [editDescription, setEditDescription] = useState("");
+    const [editPrice, setEditPrice] = useState("");
+    const [editStock, setEditStock] = useState("");
 
     async function fetchProducts() {
         try {
@@ -70,6 +76,33 @@ export default function Home() {
             setProducts((current) => current.filter((product) => product.id !== id));
         } catch (error) {
             setError("Failed to delete product");
+        }
+    }
+
+    function startEditing(product: Product) {
+        setEditingId(product.id);
+        setEditName(product.name);
+        setEditDescription(product.description ?? "");
+        setEditPrice(product.price);
+        setEditStock(String(product.stock));
+    }
+
+    async function handleUpdate(id: string) {
+        setError(null);
+
+        try {
+            const product = await updateProduct(id, {
+                name: editName,
+                description: editDescription || undefined,
+                price: Number(editPrice),
+                stock: Number(editStock),
+            });
+
+            setProducts((current) => current.map((item) => item.id === id ? product : item));
+
+            setEditingId(null);
+        } catch {
+            setError("Failed to update product");
         }
     }
 
@@ -163,27 +196,97 @@ export default function Home() {
                             key={product.id}
                             className="rounded-lg border p-4"
                         >
-                            <h2 className="font-semibold">
-                                {product.name}
-                            </h2>
+                            {editingId === product.id ? (
+                                <div className="space-y-3">
+                                    <input
+                                        className="w-full rounded border p-2"
+                                        value={editName}
+                                        onChange={(event) =>
+                                            setEditName(event.target.value)
+                                        }
+                                    />
 
-                            {product.description && (
-                                <p className="text-gray-600">
-                                    {product.description}
-                                </p>
+                                    <textarea
+                                        className="w-full rounded border p-2"
+                                        value={editDescription}
+                                        onChange={(event) =>
+                                            setEditDescription(event.target.value)
+                                        }
+                                    />
+
+                                    <input
+                                        className="w-full rounded border p-2"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        value={editPrice}
+                                        onChange={(event) =>
+                                            setEditPrice(event.target.value)
+                                        }
+                                    />
+
+                                    <input
+                                        className="w-full rounded border p-2"
+                                        type="number"
+                                        min="0"
+                                        value={editStock}
+                                        onChange={(event) =>
+                                            setEditStock(event.target.value)
+                                        }
+                                    />
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleUpdate(product.id)}
+                                            className="rounded bg-black px-3 py-1 text-white"
+                                        >
+                                            Save
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => setEditingId(null)}
+                                            className="rounded border px-3 py-1"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <h3 className="font-semibold">
+                                        {product.name}
+                                    </h3>
+
+                                    {product.description && (
+                                        <p className="text-gray-600">
+                                            {product.description}
+                                        </p>
+                                    )}
+
+                                    <p>Price: ₹{product.price}</p>
+                                    <p>Stock: {product.stock}</p>
+
+                                    <div className="mt-2 flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => startEditing(product)}
+                                            className="rounded border px-3 py-1"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDelete(product.id)}
+                                            className="rounded bg-red-600 px-3 py-1 text-white"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </>
                             )}
-
-                            <p>Price: ₹{product.price}</p>
-                            <p>Stock: {product.stock}</p>
-                            <p>Stock: {product.stock}</p>
-
-                            <button
-                                type="button"
-                                onClick={() => handleDelete(product.id)}
-                                className="mt-2 rounded bg-red-600 px-3 py-1 text-white"
-                            >
-                                Delete
-                            </button>
                         </div>
                     ))}
                 </div>

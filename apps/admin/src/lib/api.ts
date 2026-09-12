@@ -9,6 +9,13 @@ export interface CreateProductInput {
     stock: number;
 }
 
+export interface UpdateProductInput {
+    name: string;
+    description?: string;
+    price: number;
+    stock: number;
+}
+
 export async function getProducts(): Promise<Product[]> {
     const response = await fetch(`${API_URL}/products`);
 
@@ -45,4 +52,23 @@ export async function deleteProduct(id: string): Promise<void> {
     if (!response.ok) {
         throw new Error("Failed to delete product");
     }
+}
+
+export async function updateProduct(
+    id: string,
+    data: UpdateProductInput,
+): Promise<Product> {
+    const response = await fetch(`${API_URL}/products/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update product");
+    }
+
+    return response.json();
 }
