@@ -77,6 +77,22 @@ app.put("/products/:id", async (req, res) => {
     }
 });
 
+app.delete("/products/:id", async (req, res) => {
+    try {
+        await prisma.product.delete({
+            where: {
+                id: req.params.id,
+            }
+        });
+        res.json(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to delete product",
+        });
+    }
+})
+
 app.listen(4000, () => {
     console.log("API running on http://localhost:4000");
 });
