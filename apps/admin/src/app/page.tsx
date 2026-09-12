@@ -153,7 +153,7 @@ export default function Home() {
                     className="w-full rounded border p-2"
                     type="number"
                     step="0.01"
-                    min="0"
+                    min="0.01"
                     placeholder="Price"
                     value={price}
                     onChange={(event) => setPrice(event.target.value)}
