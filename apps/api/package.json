@@ -13,6 +13,7 @@
   "type": "module",
   "dependencies": {
     "@wholesale/db": "workspace:*",
+    "@wholesale/types": "workspace:*",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "zod": "^4.6.2"
@@ -22,5 +23,8 @@
     "@types/node": "^22.20.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   }
 }
