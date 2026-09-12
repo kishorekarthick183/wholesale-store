@@ -1,4 +1,5 @@
 import { prisma } from "@wholesale/db";
+import { ApiError } from "../errors/api-error.js";
 
 export async function getProducts() {
     return prisma.product.findMany({
