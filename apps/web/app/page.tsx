@@ -103,7 +103,13 @@ export default function Home() {
         );
     }
 
-        return (
+    const subtotal = cart.reduce(
+        (total, item) =>
+            total + Number(item.product.price) * item.quantity,
+        0,
+    );
+
+    return (
         <main className="p-8">
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="text-3xl font-bold">
@@ -208,11 +214,12 @@ export default function Home() {
                                         </button>
                                     </div>
 
-                                    <p className="w-24 text-right font-medium">
-                                        ₹
-                                        {Number(item.product.price) *
-                                            item.quantity}
-                                    </p>
+                                    <div className="mt-6 border-t pt-4">
+                                        <div className="flex justify-between text-lg font-semibold">
+                                            <span>Subtotal</span>
+                                            <span>₹{subtotal.toFixed(2)}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
