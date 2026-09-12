@@ -14,4 +14,38 @@ model Product {
     stock       Int      @default(0)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
+
+    orders      OrderItem[]
+}
+
+model Order {
+    id        String      @id @default(uuid())
+    name      String
+    phone     String
+    total     Decimal     @db.Decimal(10, 2)
+    status    OrderStatus @default(PENDING)
+    createdAt DateTime    @default(now())
+    updatedAt DateTime    @updatedAt
+
+    items OrderItem[]
+}
+
+model OrderItem {
+    id        String  @id @default(uuid())
+    orderId   String
+    productId String
+    quantity  Int
+    price     Decimal @db.Decimal(10, 2)
+
+    order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id])
+}
+
+enum OrderStatus {
+    PENDING
+    PAID
+    PREPARING
+    READY
+    COMPLETED
+    CANCELLED
 }
