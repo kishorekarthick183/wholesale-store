@@ -15,6 +15,14 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
     const [cart, setCart] = useState<CartItem[]>([]);
 
+    useEffect(() => {
+        const storedCart = localStorage.getItem("cart");
+
+        if (storedCart) {
+            setCart(JSON.parse(storedCart));
+        }
+    }, []);
+
     function addToCart(product: Product) {
         setCart((current) => {
             const existingItem = current.find(
@@ -86,6 +94,10 @@ export default function Home() {
 
         fetchProducts();
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem("cart", JSON.stringify(cart));
+    }, [cart]);
 
     if (loading) {
         return (
@@ -162,6 +174,8 @@ export default function Home() {
 
             {/* Paste the Cart UI Section Here */}
             <section className="mt-10">
+                <br />
+                <br />
                 <h2 className="mb-4 text-2xl font-bold">
                     Cart
                 </h2>

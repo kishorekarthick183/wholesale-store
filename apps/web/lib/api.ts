@@ -13,3 +13,48 @@ export async function getProducts(): Promise<Product[]> {
 
     return result.data;
 }
+
+export interface CreateOrderInput {
+    name: string;
+    phone: string;
+    items: {
+        productId: string;
+        quantity: number;
+    }[];
+}
+
+export interface Order {
+    id: string;
+    name: string;
+    phone: string;
+    total: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    items: {
+        id: string;
+        productId: string;
+        quantity: number;
+        price: string;
+    }[];
+}
+
+export async function createOrder(
+    data: CreateOrderInput,
+): Promise<Order> {
+    const response = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to create order");
+    }
+
+    const result: { data: Order } = await response.json();
+
+    return result.data;
+}
