@@ -14,6 +14,8 @@ export default function Home() {
     const [price, setPrice] = useState("");
     const [stock, setStock] = useState("");
 
+    const [submitting, setSubmitting] = useState(false);
+
     async function fetchProducts() {
         try {
             const data = await getProducts();
@@ -33,6 +35,8 @@ export default function Home() {
         event: React.FormEvent<HTMLFormElement>
     ) {
         event.preventDefault();
+        setError(null);
+        setSubmitting(true);
 
         try {
             const product = await createProduct({
@@ -48,6 +52,8 @@ export default function Home() {
             setStock("");
         } catch {
             setError("Failed to create product");
+        } finally {
+            setSubmitting(false);
         }
     }
 
@@ -69,9 +75,13 @@ export default function Home() {
                 onSubmit={handleSubmit}
                 className="mb-8 max-w-md space-y-4 rounded-lg border p-6"
             >
-                <h2 className="text-lg font-semibold">
-                    Add Product
-                </h2>
+                <button
+                    type="submit"
+                    disabled={submitting}
+                    className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+                >
+                    {submitting ? "Adding..." : "Add Product"}
+                </button>
 
                 <input
                     className="w-full rounded border p-2"
