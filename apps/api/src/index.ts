@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { prisma } from "@wholesale/db";
-import { createProductSchema } from "./validation/products.js";
+import { createProductSchema, updateProductSchema } from "./validation/product.js";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "./services/product.service.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import "express-async-errors";
@@ -36,7 +36,7 @@ app.post("/products", async (req, res) => {
 });
 
 app.put("/products/:id", async (req, res) => {
-    const result = createProductSchema.safeParse(req.body);
+    const result = updateProductSchema.safeParse(req.body);
     if (!result.success) {
         res.status(400).json({
             error: "Invalid product data",
