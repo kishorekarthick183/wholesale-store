@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createOrder } from "../services/order.service.js";
+import { createOrder, getOrder } from "../services/order.service.js";
 import { createOrderSchema } from "../validation/order.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { sendSuccess } from "../utils/api-response.js";
@@ -26,6 +26,15 @@ router.post(
         const order = await createOrder(result.data);
 
         sendSuccess(res, order, 201);
+    }),
+);
+
+router.get(
+    "/:id",
+    asyncHandler(async (req, res) => {
+        const order = await getOrder(req.params.id as string);
+
+        sendSuccess(res, order);
     }),
 );
 
