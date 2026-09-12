@@ -4,14 +4,43 @@ import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
 import { getProducts } from "../lib/api";
 
+interface CartItem {
+    product: Product;
+    quantity: number;
+}
+
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [cart, setCart] = useState<Product[]>([]);
+    const [cart, setCart] = useState<CartItem[]>([]);
 
     function addToCart(product: Product) {
-        setCart((current) => [...current, product]);
+        setCart((current) => {
+            const existingItem = current.find(
+                (item) => item.product.id === product.id,
+            );
+
+            if (existingItem) {
+                return current.map((item) =>
+                    item.product.id === product.id
+                        ? {
+                            ...item,
+                            quantity: item.quantity + 1,
+                        }
+                        : item,
+                );
+            }
+
+            // Nope it isn't present in the product to add in cart
+            return [
+                ...current,
+                {
+                    product,
+                    quantity: 1,
+                },
+            ];
+        });
     }
 
     useEffect(() => {
@@ -46,7 +75,7 @@ export default function Home() {
         );
     }
 
-    return (
+        return (
         <main className="p-8">
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="text-3xl font-bold">
@@ -54,10 +83,11 @@ export default function Home() {
                 </h1>
 
                 <p className="font-medium">
-                    Cart: {cart.length}
+                    Cart: {cart.reduce((total, item) => total + item.quantity, 0)}
                 </p>
             </div>
 
+            {/* Products Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {products.map((product) => (
                     <div
@@ -95,6 +125,44 @@ export default function Home() {
                     </div>
                 ))}
             </div>
+
+            {/* Paste the Cart UI Section Here */}
+            <section className="mt-10">
+                <h2 className="mb-4 text-2xl font-bold">
+                    Cart
+                </h2>
+
+                {cart.length === 0 ? (
+                    <p className="text-gray-500">
+                        Your cart is empty.
+                    </p>
+                ) : (
+                    <div className="space-y-3">
+                        {cart.map((item) => (
+                            <div
+                                key={item.product.id}
+                                className="flex items-center justify-between rounded-lg border p-4"
+                            >
+                                <div>
+                                    <p className="font-semibold">
+                                        {item.product.name}
+                                    </p>
+
+                                    <p className="text-sm text-gray-500">
+                                        ₹{item.product.price} × {item.quantity}
+                                    </p>
+                                </div>
+
+                                <p className="font-medium">
+                                    ₹
+                                    {Number(item.product.price) *
+                                        item.quantity}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </section>
         </main>
     );
 }
