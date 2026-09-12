@@ -2,27 +2,54 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { getProducts } from "@/lib/api";
+import { createProduct, getProducts } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        async function fetchProducts() {
-            try {
-                const data = await getProducts();
-                setProducts(data);
-            } catch {
-                setError("Failed to load products");
-            } finally {
-                setLoading(false);
-            }
-        }
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [price, setPrice] = useState("");
+    const [stock, setStock] = useState("");
 
+    async function fetchProducts() {
+        try {
+            const data = await getProducts();
+            setProducts(data);
+        } catch {
+            setError("Failed to load products");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
         fetchProducts();
     }, []);
+
+    async function handleSubmit(
+        event: React.FormEvent<HTMLFormElement>
+    ) {
+        event.preventDefault();
+
+        try {
+            const product = await createProduct({
+                name,
+                description: description || undefined,
+                price: Number(price),
+                stock: Number(stock),
+            });
+            setProducts((current) => [product, ...current]);
+            setName("");
+            setDescription("");
+            setPrice("");
+            setStock("");
+        } catch {
+            setError("Failed to create product");
+        }
+    }
 
     if (loading) {
         return <main className="p-8">Loading products...</main>;
@@ -34,6 +61,69 @@ export default function Home() {
 
     return (
         <main className="p-8">
+            <h1 className="mb-6 text-2xl font-bold">
+                Product Management
+            </h1>
+
+            <form
+                onSubmit={handleSubmit}
+                className="mb-8 max-w-md space-y-4 rounded-lg border p-6"
+            >
+                <h2 className="text-lg font-semibold">
+                    Add Product
+                </h2>
+
+                <input
+                    className="w-full rounded border p-2"
+                    placeholder="Product name"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    required
+                />
+
+                <textarea
+                    className="w-full rounded border p-2"
+                    placeholder="Description"
+                    value={description}
+                    onChange={(event) =>
+                        setDescription(event.target.value)
+                    }
+                />
+
+                <input
+                    className="w-full rounded border p-2"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="Price"
+                    value={price}
+                    onChange={(event) => setPrice(event.target.value)}
+                    required
+                />
+
+                <input
+                    className="w-full rounded border p-2"
+                    type="number"
+                    min="0"
+                    placeholder="Stock"
+                    value={stock}
+                    onChange={(event) => setStock(event.target.value)}
+                    required
+                />
+
+                <button
+                    type="submit"
+                    className="rounded bg-black px-4 py-2 text-white"
+                >
+                    Add Product
+                </button>
+            </form>
+
+            {error && (
+                <p className="mb-4 text-red-600">
+                    {error}
+                </p>
+            )}
             <h1 className="mb-6 text-2xl font-bold">
                 Products
             </h1>
