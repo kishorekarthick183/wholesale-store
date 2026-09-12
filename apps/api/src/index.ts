@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import { prisma } from "@wholesale/db";
 import { errorHandler } from "./middleware/error-handler.js";
 import productRoutes from "./routes/product.routes.js";
 import healthRoutes from "./routes/health.routes.js";

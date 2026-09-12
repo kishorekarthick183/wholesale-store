@@ -9,13 +9,16 @@ import {
     createProductSchema,
     updateProductSchema,
 } from "../validation/product.js";
+import { asyncHandler } from "../utils/async-handler.js";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
-    const products = await getProducts();
-    res.json(products);
-});
+router.get("/", 
+    asyncHandler(async (_req, res) => {
+        const products = await getProducts();
+        res.json(products);
+    }),
+);
 
 router.post("/", async (req, res) => {
     const result = createProductSchema.safeParse(req.body);
