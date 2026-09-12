@@ -11,7 +11,7 @@ export default function Home() {
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch("http://localhost:4000/products");
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`);
 
                 if (!response.ok) {
                     throw new Error("Failed to fetch products");
