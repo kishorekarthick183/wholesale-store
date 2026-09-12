@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
+import { getProducts } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -11,14 +12,7 @@ export default function Home() {
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`);
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch products");
-                }
-
-                const data = await response.json();
-
+                const data = await getProducts();
                 setProducts(data);
             } catch {
                 setError("Failed to load products");
