@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-interface Product {
-    id: string;
-    name: string;
-    description: string | null;
-    price: string;
-    stock: number;
-}
+import type { Product } from "@wholesale/types";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
