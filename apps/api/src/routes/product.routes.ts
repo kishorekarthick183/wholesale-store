@@ -10,6 +10,7 @@ import {
   updateProductSchema,
 } from "../validation/product.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import { sendSuccess } from "../utils/api-response.js";
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.get(
   "/",
   asyncHandler(async (_req, res) => {
     const products = await getProducts();
-    res.json(products);
+    sendSuccess(res, products);
   }),
 );
 
@@ -35,7 +36,7 @@ router.post(
     }
 
     const product = await createProduct(result.data);
-    res.status(201).json(product);
+    sendSuccess(res, product, 201);
   }),
 );
 
@@ -52,7 +53,7 @@ router.put(
     }
 
     const product = await updateProduct(req.params.id as string, result.data);
-    res.json(product);
+     sendSuccess(res, product);
   }),
 );
 
