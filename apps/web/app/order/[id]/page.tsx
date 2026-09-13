@@ -46,6 +46,7 @@ export default function OrderPage() {
                 const data = await getOrder(orderId);
 
                 setOrder(data);
+                setError(null);
             } catch {
                 setError("Order not found");
             } finally {
@@ -54,6 +55,11 @@ export default function OrderPage() {
         }
 
         fetchOrder();
+        const interval = setInterval(fetchOrder, 5000);
+
+        return () => {
+            clearInterval(interval);
+        };
     }, [orderId]);
 
     if (loading) {
