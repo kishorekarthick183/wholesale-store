@@ -1,5 +1,6 @@
 "use client";
 
+import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getOrder, type Order } from "../../../lib/api";
@@ -46,6 +47,17 @@ export default function PaymentPage() {
         );
     }
 
+    const upiId = process.env.NEXT_PUBLIC_UPI_ID;
+    const upiName =
+        process.env.NEXT_PUBLIC_UPI_NAME ?? "Wholesale Store";
+
+    const upiUrl =
+        `upi://pay?pa=${encodeURIComponent(upiId ?? "")}` +
+        `&pn=${encodeURIComponent(upiName)}` +
+        `&am=${encodeURIComponent(order.total)}` +
+        `&cu=INR` +
+        `&tn=${encodeURIComponent(`Order ${order.id}`)}`;
+
     return (
         <main className="mx-auto max-w-lg p-8">
             <h1 className="text-3xl font-bold">
@@ -70,9 +82,15 @@ export default function PaymentPage() {
                         Pay using UPI
                     </p>
 
-                    <p className="mt-2 text-sm text-gray-600">
-                        Scan the QR code provided by the shop
-                        and pay the exact amount.
+                    <div className="mt-6 flex justify-center rounded-lg bg-white p-6">
+                    <QRCodeSVG
+                        value={upiUrl}
+                        size={240}
+                    />
+                    </div>
+
+                    <p className="mt-4 text-center text-sm text-gray-600">
+                        Scan this QR code with any UPI app
                     </p>
                 </div>
 
