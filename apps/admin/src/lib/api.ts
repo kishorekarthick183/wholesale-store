@@ -110,6 +110,7 @@ export type OrderStatus =
     | "PREPARING"
     | "READY"
     | "COMPLETED"
+    | "PAYMENT_SUBMITTED"
     | "CANCELLED";
 
 export async function updateOrderStatus(
