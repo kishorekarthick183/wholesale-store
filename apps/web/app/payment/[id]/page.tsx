@@ -4,17 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getOrder, type Order } from "../../../lib/api";
 
-export default function OrderPage() {
+export default function PaymentPage() {
     const params = useParams();
     const orderId = params.id as string;
 
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const upiId = process.env.NEXT_PUBLIC_UPI_ID;
-    const upiName =
-        process.env.NEXT_PUBLIC_UPI_NAME ?? "Wholesale Store";
 
     useEffect(() => {
         async function fetchOrder() {
@@ -35,7 +31,7 @@ export default function OrderPage() {
     if (loading) {
         return (
             <main className="mx-auto max-w-lg p-8">
-                Loading order...
+                Loading payment...
             </main>
         );
     }
@@ -46,24 +42,14 @@ export default function OrderPage() {
                 <h1 className="text-2xl font-bold">
                     Order not found
                 </h1>
-
-                <p className="mt-2 text-gray-600">
-                    We couldn't find this order.
-                </p>
             </main>
         );
     }
-    const upiUrl =
-        `upi://pay?pa=${encodeURIComponent(upiId ?? "")}` +
-        `&pn=${encodeURIComponent(upiName)}` +
-        `&am=${encodeURIComponent(order.total)}` +
-        `&cu=INR` +
-        `&tn=${encodeURIComponent(`Order ${order.id}`)}`;
 
     return (
         <main className="mx-auto max-w-lg p-8">
             <h1 className="text-3xl font-bold">
-                Pay for your order
+                Payment
             </h1>
 
             <p className="mt-2 text-gray-600">
@@ -85,32 +71,24 @@ export default function OrderPage() {
                     </p>
 
                     <p className="mt-2 text-sm text-gray-600">
-                        Scan the shop's UPI QR code or use the
-                        UPI payment button below.
+                        Scan the QR code provided by the shop
+                        and pay the exact amount.
                     </p>
                 </div>
 
-                <div className="mt-6 rounded-lg bg-gray-100 p-4 text-center">
+                <div className="mt-6 rounded-lg bg-gray-100 p-6 text-center">
                     <p className="text-sm text-gray-500">
-                        UPI ID
+                        UPI payment
                     </p>
 
-                    <p className="mt-1 font-mono font-semibold">
-                        {upiId}
+                    <p className="mt-2 font-semibold">
+                        ₹{order.total}
                     </p>
                 </div>
-
-                <a
-                    href={upiUrl}
-                    className="mt-6 block rounded bg-black px-4 py-3 text-center font-medium text-white"
-                >
-                    Pay ₹{order.total} with UPI
-                </a>
             </div>
 
             <p className="mt-6 text-center text-sm text-gray-500">
-                After completing the payment, keep your order
-                number ready for the shop staff.
+                After payment, keep your order number ready.
             </p>
         </main>
     );

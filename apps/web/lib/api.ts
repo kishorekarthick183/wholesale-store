@@ -58,3 +58,15 @@ export async function createOrder(
 
     return result.data;
 }
+
+export async function getOrder(id: string): Promise<Order> {
+    const response = await fetch(`${API_URL}/orders/${id}`);
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch order");
+    }
+
+    const result: { data: Order } = await response.json();
+
+    return result.data;
+}
