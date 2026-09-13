@@ -122,7 +122,7 @@ export default function OrderPage() {
             </h1>
 
             <p className="mt-2 text-gray-600">
-                Order #{order.id}
+                Order #{order.orderNumber}
             </p>
 
             <div className="mt-8 rounded-lg border p-6">

@@ -25,6 +25,7 @@ export interface CreateOrderInput {
 
 export interface Order {
     id: string;
+    orderNumber: number;
     name: string;
     phone: string;
     total: string;
