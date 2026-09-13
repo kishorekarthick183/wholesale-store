@@ -81,34 +81,6 @@ router.patch(
     }),
 );
 
-router.patch(
-    "/:id/status",
-    asyncHandler(async (req, res) => {
-        const result = updateOrderStatusSchema.safeParse(
-            req.body,
-        );
-
-        if (!result.success) {
-            res.status(400).json({
-                error: {
-                    message: "Invalid order status",
-                    code: "VALIDATION_ERROR",
-                    details: result.error.issues,
-                },
-            });
-
-            return;
-        }
-
-        const order = await updateOrderStatus(
-            req.params.id as string,
-            result.data.status,
-        );
-
-        sendSuccess(res, order);
-    }),
-);
-
 router.post(
     "/:id/payment-submitted",
     asyncHandler(async (req, res) => {
