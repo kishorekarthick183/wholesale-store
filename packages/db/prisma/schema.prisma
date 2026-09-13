@@ -43,6 +43,7 @@ model OrderItem {
 
 enum OrderStatus {
     PENDING
+    PAYMENT_SUBMITTED
     PAID
     PREPARING
     READY
