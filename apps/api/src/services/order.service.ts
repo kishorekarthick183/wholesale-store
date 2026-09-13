@@ -79,28 +79,38 @@ export async function createOrder(data: CreateOrderInput) {
 
 export async function getOrder(id: string) {
     const order = await prisma.order.findUnique({
-        where: {
-            id,
-        },
+        where: { id },
         include: {
-            items: true,
+            items: {
+                include: {
+                    product: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
         },
     });
 
-    if (!order) {
-        throw new ApiError(404, "Order not found");
-    }
+    if (!order) throw new ApiError(404, "Order not found");
 
     return order;
 }
 
 export async function getOrders() {
     return prisma.order.findMany({
-        orderBy: {
-            createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
         include: {
-            items: true,
+            items: {
+                include: {
+                    product: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
         },
     });
 }

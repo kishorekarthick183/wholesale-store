@@ -18,8 +18,13 @@ export interface CreateOrderInput {
     name: string;
     phone: string;
     items: {
+        id: string;
         productId: string;
         quantity: number;
+        price: string;
+        product: {
+            name: string;
+        };
     }[];
 }
 

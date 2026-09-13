@@ -111,7 +111,7 @@ export default function OrderPage() {
                         >
                             <div>
                                 <p className="font-medium">
-                                    Product
+                                    {item.product.name}
                                 </p>
 
                                 <p className="text-sm text-gray-500">
