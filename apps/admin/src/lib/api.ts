@@ -137,3 +137,9 @@ export async function updateOrderStatus(
 
     return result.data;
 }
+
+export async function verifyPayment(
+    id: string,
+): Promise<Order> {
+    return updateOrderStatus(id, "PAID");
+}
