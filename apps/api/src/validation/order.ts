@@ -16,3 +16,20 @@ export const createOrderSchema = z
     .strict();
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+
+export const updateOrderStatusSchema = z
+    .object({
+        status: z.enum([
+            "PENDING",
+            "PAID",
+            "PREPARING",
+            "READY",
+            "COMPLETED",
+            "CANCELLED",
+        ]),
+    })
+    .strict();
+
+export type UpdateOrderStatusInput = z.infer<
+    typeof updateOrderStatusSchema
+>;

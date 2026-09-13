@@ -1,6 +1,6 @@
 import { prisma } from "@wholesale/db";
 import { ApiError } from "../errors/api-error.js";
-import type { CreateOrderInput } from "../validation/order.js";
+import type { CreateOrderInput, UpdateOrderStatusInput } from "../validation/order.js";
 
 export async function createOrder(data: CreateOrderInput) {
     return prisma.$transaction(async (tx) => {
@@ -98,6 +98,33 @@ export async function getOrders() {
     return prisma.order.findMany({
         orderBy: {
             createdAt: "desc",
+        },
+        include: {
+            items: true,
+        },
+    });
+}
+
+export async function updateOrderStatus(
+    id: string,
+    status: UpdateOrderStatusInput["status"],
+) {
+    const order = await prisma.order.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if (!order) {
+        throw new ApiError(404, "Order not found");
+    }
+
+    return prisma.order.update({
+        where: {
+            id,
+        },
+        data: {
+            status,
         },
         include: {
             items: true,

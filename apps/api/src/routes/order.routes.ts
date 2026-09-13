@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createOrder, getOrder, getOrders } from "../services/order.service.js";
-import { createOrderSchema } from "../validation/order.js";
+import { createOrder, getOrder, getOrders, updateOrderStatus } from "../services/order.service.js";
+import { createOrderSchema, updateOrderStatusSchema } from "../validation/order.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { sendSuccess } from "../utils/api-response.js";
 
@@ -44,6 +44,62 @@ router.get(
         const orders = await getOrders();
 
         sendSuccess(res, orders);
+    }),
+);
+
+router.patch(
+    "/:id/status",
+    asyncHandler(async (req, res) => {
+        const result = updateOrderStatusSchema.safeParse(
+            req.body,
+        );
+
+        if (!result.success) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid order status",
+                    code: "VALIDATION_ERROR",
+                    details: result.error.issues,
+                },
+            });
+
+            return;
+        }
+
+        const order = await updateOrderStatus(
+            req.params.id as string,
+            result.data.status,
+        );
+
+        sendSuccess(res, order);
+    }),
+);
+
+router.patch(
+    "/:id/status",
+    asyncHandler(async (req, res) => {
+        const result = updateOrderStatusSchema.safeParse(
+            req.body,
+        );
+
+        if (!result.success) {
+            res.status(400).json({
+                error: {
+                    message: "Invalid order status",
+                    code: "VALIDATION_ERROR",
+                    details: result.error.issues,
+                },
+            });
+
+            return;
+        }
+
+        const order = await updateOrderStatus(
+            req.params.id as string,
+            result.data.status,
+        );
+
+        sendSuccess(res, order);
     }),
 );
 
