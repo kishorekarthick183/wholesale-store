@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { createOrder, getOrder, getOrders, updateOrderStatus } from "../services/order.service.js";
+import { 
+    createOrder, 
+    getOrder, 
+    getOrders, 
+    updateOrderStatus,
+    submitPayment,
+} from "../services/order.service.js";
 import { createOrderSchema, updateOrderStatusSchema } from "../validation/order.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { sendSuccess } from "../utils/api-response.js";
@@ -98,6 +104,15 @@ router.patch(
             req.params.id as string,
             result.data.status,
         );
+
+        sendSuccess(res, order);
+    }),
+);
+
+router.post(
+    "/:id/payment-submitted",
+    asyncHandler(async (req, res) => {
+        const order = await submitPayment(req.params.id);
 
         sendSuccess(res, order);
     }),

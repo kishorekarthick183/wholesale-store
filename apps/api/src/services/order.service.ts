@@ -155,3 +155,34 @@ function isValidStatusTransition(
 
     return transitions[current]?.includes(next) ?? false;
 }
+
+export async function submitPayment(id: string) {
+    const order = await prisma.order.findUnique({
+        where: {
+            id,
+        },
+    });
+
+    if (!order) {
+        throw new ApiError(404, "Order not found");
+    }
+
+    if (order.status !== "PENDING") {
+        throw new ApiError(
+            400,
+            "Payment cannot be submitted for this order",
+        );
+    }
+
+    return prisma.order.update({
+        where: {
+            id,
+        },
+        data: {
+            status: "PAYMENT_SUBMITTED",
+        },
+        include: {
+            items: true,
+        },
+    });
+}
