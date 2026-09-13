@@ -40,6 +40,12 @@ export default function OrderPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    function isFinalStatus(status: string) {
+        return (
+            status === "COMPLETED" ||
+            status === "CANCELLED"
+        );
+    }
     useEffect(() => {
         async function fetchOrder() {
             try {
@@ -47,18 +53,43 @@ export default function OrderPage() {
 
                 setOrder(data);
                 setError(null);
+
+                return data;
             } catch {
                 setError("Order not found");
+                return null;
             } finally {
                 setLoading(false);
             }
         }
 
-        fetchOrder();
-        const interval = setInterval(fetchOrder, 5000);
+        let interval: ReturnType<typeof setInterval> | undefined;
+
+        async function startPolling() {
+            const data = await fetchOrder();
+
+            if (data && !isFinalStatus(data.status)) {
+                interval = setInterval(async () => {
+                    const updatedOrder = await fetchOrder();
+
+                    if (
+                        updatedOrder &&
+                        isFinalStatus(updatedOrder.status)
+                    ) {
+                        if (interval) {
+                            clearInterval(interval);
+                        }
+                    }
+                }, 5000);
+            }
+        }
+
+        startPolling();
 
         return () => {
-            clearInterval(interval);
+            if (interval) {
+                clearInterval(interval);
+            }
         };
     }, [orderId]);
 
