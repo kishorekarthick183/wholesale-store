@@ -452,7 +452,7 @@ export default function Home() {
                                 </p>
 
                                 <p className="break-all font-mono text-sm">
-                                    {order.id}
+                                    {order.orderNumber}
                                 </p>
                             </div>
 

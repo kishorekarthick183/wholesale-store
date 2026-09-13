@@ -18,6 +18,7 @@ export interface UpdateProductInput {
 
 export interface Order {
     id: string;
+    orderNumber: number;
     name: string;
     phone: string;
     total: string;
