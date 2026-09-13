@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import type { Product } from "@wholesale/types";
 import { getProducts } from "../lib/api";
 
@@ -172,10 +173,7 @@ export default function Home() {
                 ))}
             </div>
 
-            {/* Paste the Cart UI Section Here */}
             <section className="mt-10">
-                <br />
-                <br />
                 <h2 className="mb-4 text-2xl font-bold">
                     Cart
                 </h2>
@@ -201,42 +199,42 @@ export default function Home() {
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                decreaseQuantity(item.product.id)
-                                            }
-                                            className="h-8 w-8 rounded border"
-                                        >
-                                            −
-                                        </button>
+                               <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => decreaseQuantity(item.product.id)}
+                                        className="h-8 w-8 rounded border"
+                                    >
+                                        −
+                                    </button>
 
-                                        <span className="w-6 text-center">
-                                            {item.quantity}
-                                        </span>
+                                    <span className="w-6 text-center">
+                                        {item.quantity}
+                                    </span>
 
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                increaseQuantity(item.product.id)
-                                            }
-                                            className="h-8 w-8 rounded border"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-
-                                    <div className="mt-6 border-t pt-4">
-                                        <div className="flex justify-between text-lg font-semibold">
-                                            <span>Subtotal</span>
-                                            <span>₹{subtotal.toFixed(2)}</span>
-                                        </div>
-                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => increaseQuantity(item.product.id)}
+                                        className="h-8 w-8 rounded border"
+                                    >
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         ))}
+                        <div className="mt-6 border-t pt-4">
+                            <div className="flex justify-between text-lg font-semibold">
+                                <span>Subtotal</span>
+                                <span>₹{subtotal.toFixed(2)}</span>
+                            </div>
+
+                            <Link
+                                href="/checkout"
+                                className="mt-4 block w-full rounded bg-black px-4 py-2 text-center text-white"
+                            >
+                                Checkout
+                            </Link>
+                        </div>
                     </div>
                 )}
             </section>
