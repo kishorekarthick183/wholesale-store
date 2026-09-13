@@ -38,7 +38,7 @@ export default function Home() {
     function getNextStatuses(status: OrderStatus): OrderStatus[] {
         switch (status) {
             case "PENDING":
-                return ["PAYMENT_SUBMITTED", "CANCELLED"];
+                return ["CANCELLED"];
 
             case "PAYMENT_SUBMITTED":
                 return ["PAID", "CANCELLED"];
@@ -179,10 +179,12 @@ export default function Home() {
 
     async function handleOrderStatusChange(
         orderId: string,
+        status: OrderStatus
     ) {
         try {
-            const updatedOrder = await verifyPayment(
+            const updatedOrder = await updateOrderStatus(
                 orderId,
+                status,
             );
 
             setOrders((current) =>
@@ -423,16 +425,17 @@ export default function Home() {
                                 </div>
 
                                 <select
-                                    value={getStatusLabel(order.status as OrderStatus)}
-                                    onChange={() =>
+                                    value={order.status}
+                                    onChange={(event) =>
                                         handleOrderStatusChange(
                                             order.id,
+                                            event.target.value as OrderStatus
                                         )
                                     }
                                     disabled={getNextStatuses(order.status as OrderStatus).length === 0}
                                     className="rounded border px-3 py-2"
                                 >
-                                    <option value={getStatusLabel(order.status as OrderStatus)}>
+                                    <option value={order.status}>
                                         {getStatusLabel(order.status as OrderStatus)}
                                     </option>
 
