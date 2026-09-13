@@ -35,6 +35,31 @@ export default function Home() {
         }
     }
 
+    function getNextStatuses(status: OrderStatus): OrderStatus[] {
+        switch (status) {
+            case "PENDING":
+                return ["PAYMENT_SUBMITTED", "CANCELLED"];
+
+            case "PAYMENT_SUBMITTED":
+                return ["PAID", "CANCELLED"];
+
+            case "PAID":
+                return ["PREPARING"];
+
+            case "PREPARING":
+                return ["READY"];
+
+            case "READY":
+                return ["COMPLETED"];
+
+            case "COMPLETED":
+                return [];
+
+            case "CANCELLED":
+                return [];
+        }
+    }
+
     useEffect(() => {
         async function fetchData() {
             try {
@@ -379,14 +404,20 @@ export default function Home() {
                                             order.id,
                                         )
                                     }
-                                    className="rounded border px-3 py-1 font-medium"
+                                    disabled={getNextStatuses(order.status as OrderStatus).length === 0}
+                                    className="rounded border px-3 py-2"
                                 >
-                                    <option value="PENDING">Pending</option>
-                                    <option value="PAID">Paid</option>
-                                    <option value="PREPARING">Preparing</option>
-                                    <option value="READY">Ready</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value={order.status}>
+                                        {order.status}
+                                    </option>
+
+                                    {getNextStatuses(order.status as OrderStatus).map(
+                                        (status) => (
+                                            <option key={status} value={status}>
+                                                {status}
+                                            </option>
+                                        ),
+                                    )}
                                 </select>
                             </div>
 
