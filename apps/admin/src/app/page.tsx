@@ -60,6 +60,31 @@ export default function Home() {
         }
     }
 
+    function getStatusLabel(status: OrderStatus) {
+        switch (status) {
+            case "PENDING":
+                return "Pending";
+
+            case "PAYMENT_SUBMITTED":
+                return "Payment Submitted";
+
+            case "PAID":
+                return "Paid";
+
+            case "PREPARING":
+                return "Preparing";
+
+            case "READY":
+                return "Ready";
+
+            case "COMPLETED":
+                return "Completed";
+
+            case "CANCELLED":
+                return "Cancelled";
+        }
+    }
+
     useEffect(() => {
         async function fetchData() {
             try {
@@ -398,7 +423,7 @@ export default function Home() {
                                 </div>
 
                                 <select
-                                    value={order.status}
+                                    value={getStatusLabel(order.status as OrderStatus)}
                                     onChange={() =>
                                         handleOrderStatusChange(
                                             order.id,
@@ -407,14 +432,14 @@ export default function Home() {
                                     disabled={getNextStatuses(order.status as OrderStatus).length === 0}
                                     className="rounded border px-3 py-2"
                                 >
-                                    <option value={order.status}>
-                                        {order.status}
+                                    <option value={getStatusLabel(order.status as OrderStatus)}>
+                                        {getStatusLabel(order.status as OrderStatus)}
                                     </option>
 
                                     {getNextStatuses(order.status as OrderStatus).map(
                                         (status) => (
                                             <option key={status} value={status}>
-                                                {status}
+                                                {getStatusLabel(status)}
                                             </option>
                                         ),
                                     )}
