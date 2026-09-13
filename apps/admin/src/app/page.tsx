@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { createProduct, getProducts, deleteProduct, updateProduct } from "@/lib/api";
+import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -21,6 +21,7 @@ export default function Home() {
     const [editDescription, setEditDescription] = useState("");
     const [editPrice, setEditPrice] = useState("");
     const [editStock, setEditStock] = useState("");
+    const [orders, setOrders] = useState<Order[]>([]);
 
     async function fetchProducts() {
         try {
@@ -32,6 +33,25 @@ export default function Home() {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const [products, orders] = await Promise.all([
+                    getProducts(),
+                    getOrders(),
+                ]);
+
+                setProducts(products);
+                setOrders(orders);
+            } catch {
+                setError("Failed to load data");
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
 
     useEffect(() => {
         fetchProducts();
@@ -291,6 +311,67 @@ export default function Home() {
                     ))}
                 </div>
             )}
+            <section className="mt-12">
+            <h2 className="mb-4 text-2xl font-bold">
+                Orders
+            </h2>
+
+            {orders.length === 0 ? (
+                <p className="text-gray-500">
+                    No orders yet.
+                </p>
+            ) : (
+                <div className="space-y-4">
+                    {orders.map((order) => (
+                        <div
+                            key={order.id}
+                            className="rounded-lg border p-4"
+                        >
+                            <div className="flex justify-between">
+                                <div>
+                                    <p className="font-semibold">
+                                        {order.name}
+                                    </p>
+
+                                    <p className="text-sm text-gray-500">
+                                        {order.phone}
+                                    </p>
+                                </div>
+
+                                <span className="font-semibold">
+                                    {order.status}
+                                </span>
+                            </div>
+
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-500">
+                                    Order ID
+                                </p>
+
+                                <p className="break-all font-mono text-sm">
+                                    {order.id}
+                                </p>
+                            </div>
+
+                            <div className="mt-4 flex justify-between border-t pt-4">
+                                <span>
+                                    {order.items.reduce(
+                                        (total, item) =>
+                                            total + item.quantity,
+                                        0,
+                                    )}{" "}
+                                    items
+                                </span>
+
+                                <span className="font-bold">
+                                    ₹{order.total}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </section>
         </main>
     );
 }
