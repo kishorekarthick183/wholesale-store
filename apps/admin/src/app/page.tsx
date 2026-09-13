@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Product } from "@wholesale/types";
 import {
   createProduct,
@@ -12,9 +13,13 @@ import {
   verifyPayment,
   type OrderStatus,
   updateOrderStatus,
+  logout,
 } from "@/lib/api";
+import { useRequireAuth } from "@/lib/use-require-auth";
 
 export default function Home() {
+  const router = useRouter();
+  const { user, checking } = useRequireAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,17 +37,6 @@ export default function Home() {
   const [editPrice, setEditPrice] = useState("");
   const [editStock, setEditStock] = useState("");
   const [orders, setOrders] = useState<Order[]>([]);
-
-  async function fetchProducts() {
-    try {
-      const data = await getProducts();
-      setProducts(data);
-    } catch {
-      setError("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function getNextStatuses(status: OrderStatus): OrderStatus[] {
     switch (status) {
@@ -95,6 +89,8 @@ export default function Home() {
   }
 
   useEffect(() => {
+    if (!user) return;
+
     async function fetchData() {
       try {
         const [products, orders] = await Promise.all([
@@ -111,11 +107,12 @@ export default function Home() {
       }
     }
     fetchData();
-  }, []);
+  }, [user]);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  async function handleLogout() {
+    await logout();
+    router.replace("/login");
+  }
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -211,6 +208,10 @@ export default function Home() {
     }
   }
 
+  if (checking) {
+    return <main className="p-8">Checking session...</main>;
+  }
+
   if (loading) {
     return <main className="p-8">Loading products...</main>;
   }
@@ -221,7 +222,21 @@ export default function Home() {
 
   return (
     <main className="p-8">
-      <h1 className="mb-6 text-2xl font-bold">Product Management</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Product Management</h1>
+
+        <div className="flex items-center gap-4">
+          {user && <span className="text-sm text-gray-500">{user.name}</span>}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded border px-3 py-1 text-sm"
+          >
+            Log out
+          </button>
+        </div>
+      </div>
 
       <form
         onSubmit={handleSubmit}

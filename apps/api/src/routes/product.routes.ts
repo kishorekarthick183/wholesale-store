@@ -11,6 +11,7 @@ import {
 } from "../validation/product.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { sendSuccess } from "../utils/api-response.js";
+import { requireAuth } from "../middleware/require-auth.js";
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.get(
 
 router.post(
   "/",
+  requireAuth,
   asyncHandler(async (req, res) => {
     const result = createProductSchema.safeParse(req.body);
 
@@ -42,6 +44,7 @@ router.post(
 
 router.put(
   "/:id",
+  requireAuth,
   asyncHandler(async (req, res) => {
     const result = updateProductSchema.safeParse(req.body);
     if (!result.success) {
@@ -59,6 +62,7 @@ router.put(
 
 router.delete(
   "/:id",
+  requireAuth,
   asyncHandler(async (req, res) => {
     await deleteProduct(req.params.id as string);
     res.status(204).send();

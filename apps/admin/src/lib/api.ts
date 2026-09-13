@@ -33,8 +33,75 @@ export interface Order {
   }[];
 }
 
+export interface CurrentUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+class UnauthenticatedError extends Error {
+  constructor() {
+    super("Not authenticated");
+    this.name = "UnauthenticatedError";
+  }
+}
+
+export { UnauthenticatedError };
+
+async function apiFetch(
+  path: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    credentials: "include",
+    headers: {
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      ...init.headers,
+    },
+  });
+
+  if (response.status === 401) {
+    throw new UnauthenticatedError();
+  }
+
+  return response;
+}
+
+export async function login(
+  email: string,
+  password: string,
+): Promise<CurrentUser> {
+  const response = await apiFetch("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Invalid email or password");
+  }
+
+  const result: { data: CurrentUser } = await response.json();
+  return result.data;
+}
+
+export async function logout(): Promise<void> {
+  await apiFetch("/auth/logout", { method: "POST" });
+}
+
+export async function getCurrentUser(): Promise<CurrentUser> {
+  const response = await apiFetch("/auth/me");
+
+  if (!response.ok) {
+    throw new UnauthenticatedError();
+  }
+
+  const result: { data: CurrentUser } = await response.json();
+  return result.data;
+}
+
 export async function getProducts(): Promise<Product[]> {
-  const response = await fetch(`${API_URL}/products`);
+  const response = await apiFetch("/products");
 
   if (!response.ok) {
     throw new Error("Failed to fetch products");
@@ -47,11 +114,8 @@ export async function getProducts(): Promise<Product[]> {
 export async function createProduct(
   data: CreateProductInput,
 ): Promise<Product> {
-  const response = await fetch(`${API_URL}/products`, {
+  const response = await apiFetch("/products", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
 
@@ -64,7 +128,7 @@ export async function createProduct(
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  const response = await fetch(`${API_URL}/products/${id}`, {
+  const response = await apiFetch(`/products/${id}`, {
     method: "DELETE",
   });
 
@@ -77,11 +141,8 @@ export async function updateProduct(
   id: string,
   data: UpdateProductInput,
 ): Promise<Product> {
-  const response = await fetch(`${API_URL}/products/${id}`, {
+  const response = await apiFetch(`/products/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(data),
   });
 
@@ -94,7 +155,7 @@ export async function updateProduct(
 }
 
 export async function getOrders(): Promise<Order[]> {
-  const response = await fetch(`${API_URL}/orders`);
+  const response = await apiFetch("/orders");
 
   if (!response.ok) {
     throw new Error("Failed to fetch orders");
@@ -106,7 +167,7 @@ export async function getOrders(): Promise<Order[]> {
 }
 
 export async function getOrder(id: string): Promise<Order> {
-  const response = await fetch(`${API_URL}/orders/${id}`);
+  const response = await apiFetch(`/orders/${id}`);
 
   if (!response.ok) {
     throw new Error("Failed to fetch order");
@@ -130,11 +191,8 @@ export async function updateOrderStatus(
   id: string,
   status: OrderStatus,
 ): Promise<Order> {
-  const response = await fetch(`${API_URL}/orders/${id}/status`, {
+  const response = await apiFetch(`/orders/${id}/status`, {
     method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({
       status,
     }),

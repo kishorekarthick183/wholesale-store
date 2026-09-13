@@ -12,6 +12,7 @@ import {
 } from "../validation/order.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { sendSuccess } from "../utils/api-response.js";
+import { requireAuth } from "../middleware/require-auth.js";
 
 const router = Router();
 
@@ -49,6 +50,7 @@ router.get(
 
 router.get(
   "/",
+  requireAuth,
   asyncHandler(async (_req, res) => {
     const orders = await getOrders();
 
@@ -58,6 +60,7 @@ router.get(
 
 router.patch(
   "/:id/status",
+  requireAuth,
   asyncHandler(async (req, res) => {
     const result = updateOrderStatusSchema.safeParse(req.body);
 

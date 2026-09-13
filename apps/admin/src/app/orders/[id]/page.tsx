@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getOrder, type Order } from "../../../lib/api";
+import { useRequireAuth } from "../../../lib/use-require-auth";
 
 function getStatusLabel(status: string) {
   switch (status) {
@@ -35,12 +36,15 @@ function getStatusLabel(status: string) {
 export default function OrderDetailsPage() {
   const params = useParams();
   const orderId = params.id as string;
+  const { checking } = useRequireAuth();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (checking) return;
+
     async function fetchOrder() {
       try {
         const data = await getOrder(orderId);
@@ -54,7 +58,11 @@ export default function OrderDetailsPage() {
     }
 
     fetchOrder();
-  }, [orderId]);
+  }, [orderId, checking]);
+
+  if (checking) {
+    return <main className="p-8">Checking session...</main>;
+  }
 
   if (loading) {
     return <main className="p-8">Loading order...</main>;
