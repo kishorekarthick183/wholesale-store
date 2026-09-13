@@ -93,3 +93,14 @@ export async function getOrder(id: string) {
 
     return order;
 }
+
+export async function getOrders() {
+    return prisma.order.findMany({
+        orderBy: {
+            createdAt: "desc",
+        },
+        include: {
+            items: true,
+        },
+    });
+}
