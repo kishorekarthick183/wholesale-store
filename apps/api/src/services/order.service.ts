@@ -144,9 +144,10 @@ function isValidStatusTransition(
     next: string,
 ): boolean {
     const transitions: Record<string, string[]> = {
-        PENDING: ["PAID", "CANCELLED"],
-        PAID: ["PREPARING", "CANCELLED"],
-        PREPARING: ["READY", "CANCELLED"],
+        PENDING: ["PAYMENT_SUBMITTED", "CANCELLED"],
+        PAYMENT_SUBMITTED: ["PAID", "CANCELLED"],
+        PAID: ["PREPARING"],
+        PREPARING: ["READY"],
         READY: ["COMPLETED"],
         COMPLETED: [],
         CANCELLED: [],
