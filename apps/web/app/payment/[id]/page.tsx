@@ -120,7 +120,6 @@ export default function PaymentPage() {
                     </p>
                 </div>
 
-                {/* ADD THE BUTTON HERE */}
                 <button
                     type="button"
                     onClick={handlePaymentSubmitted}
