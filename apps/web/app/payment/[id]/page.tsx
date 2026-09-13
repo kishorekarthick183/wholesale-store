@@ -3,7 +3,7 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getOrder, type Order } from "../../../lib/api";
+import { getOrder, type Order, submitPayment } from "../../../lib/api";
 
 export default function PaymentPage() {
     const params = useParams();
@@ -12,6 +12,22 @@ export default function PaymentPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+
+    async function handlePaymentSubmitted() {
+        setSubmitting(true);
+        setError(null);
+
+        try {
+            await submitPayment(orderId);
+
+            window.location.href = `/order/${orderId}`;
+        } catch {
+            setError("Failed to submit payment");
+        } finally {
+            setSubmitting(false);
+        }
+    }
 
     useEffect(() => {
         async function fetchOrder() {
@@ -58,6 +74,8 @@ export default function PaymentPage() {
         `&cu=INR` +
         `&tn=${encodeURIComponent(`Order ${order.id}`)}`;
 
+    // ... (rest of your component code remains the same)
+
     return (
         <main className="mx-auto max-w-lg p-8">
             <h1 className="text-3xl font-bold">
@@ -83,10 +101,10 @@ export default function PaymentPage() {
                     </p>
 
                     <div className="mt-6 flex justify-center rounded-lg bg-white p-6">
-                    <QRCodeSVG
-                        value={upiUrl}
-                        size={240}
-                    />
+                        <QRCodeSVG
+                            value={upiUrl}
+                            size={240}
+                        />
                     </div>
 
                     <p className="mt-4 text-center text-sm text-gray-600">
@@ -103,6 +121,17 @@ export default function PaymentPage() {
                         ₹{order.total}
                     </p>
                 </div>
+
+                {/* ADD THE BUTTON HERE */}
+                <button
+                    type="button"
+                    onClick={handlePaymentSubmitted}
+                    disabled={submitting || order.status !== "PENDING"}
+                    className="mt-6 w-full rounded bg-black px-4 py-3 text-white disabled:opacity-50"
+                >
+                    {submitting ? "Submitting..." : "I've Paid"}
+                </button>
+                
             </div>
 
             <p className="mt-6 text-center text-sm text-gray-500">
@@ -110,4 +139,5 @@ export default function PaymentPage() {
             </p>
         </main>
     );
+
 }

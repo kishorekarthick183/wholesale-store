@@ -70,3 +70,22 @@ export async function getOrder(id: string): Promise<Order> {
 
     return result.data;
 }
+
+export async function submitPayment(
+    id: string,
+): Promise<Order> {
+    const response = await fetch(
+        `${API_URL}/orders/${id}/payment-submitted`,
+        {
+            method: "POST",
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to submit payment");
+    }
+
+    const result: { data: Order } = await response.json();
+
+    return result.data;
+}
