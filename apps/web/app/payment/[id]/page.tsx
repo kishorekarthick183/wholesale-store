@@ -74,8 +74,6 @@ export default function PaymentPage() {
         `&cu=INR` +
         `&tn=${encodeURIComponent(`Order ${order.id}`)}`;
 
-    // ... (rest of your component code remains the same)
-
     return (
         <main className="mx-auto max-w-lg p-8">
             <h1 className="text-3xl font-bold">

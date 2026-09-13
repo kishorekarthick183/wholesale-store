@@ -4,6 +4,34 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getOrder, type Order } from "../../../lib/api";
 
+function getStatusMessage(status: string) {
+    switch (status) {
+        case "PENDING":
+            return "Waiting for payment";
+
+        case "PAYMENT_SUBMITTED":
+            return "Payment submitted — waiting for shop confirmation";
+
+        case "PAID":
+            return "Payment confirmed";
+
+        case "PREPARING":
+            return "Your order is being prepared";
+
+        case "READY":
+            return "Your order is ready for pickup";
+
+        case "COMPLETED":
+            return "Order completed";
+
+        case "CANCELLED":
+            return "Order cancelled";
+
+        default:
+            return status;
+    }
+}
+
 export default function OrderPage() {
     const params = useParams();
     const orderId = params.id as string;
@@ -11,10 +39,6 @@ export default function OrderPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    const upiId = process.env.NEXT_PUBLIC_UPI_ID;
-    const upiName =
-        process.env.NEXT_PUBLIC_UPI_NAME ?? "Wholesale Store";
 
     useEffect(() => {
         async function fetchOrder() {
@@ -53,17 +77,11 @@ export default function OrderPage() {
             </main>
         );
     }
-    const upiUrl =
-        `upi://pay?pa=${encodeURIComponent(upiId ?? "")}` +
-        `&pn=${encodeURIComponent(upiName)}` +
-        `&am=${encodeURIComponent(order.total)}` +
-        `&cu=INR` +
-        `&tn=${encodeURIComponent(`Order ${order.id}`)}`;
 
     return (
         <main className="mx-auto max-w-lg p-8">
             <h1 className="text-3xl font-bold">
-                Pay for your order
+                Order Confirmed
             </h1>
 
             <p className="mt-2 text-gray-600">
@@ -72,46 +90,63 @@ export default function OrderPage() {
 
             <div className="mt-8 rounded-lg border p-6">
                 <p className="text-sm text-gray-500">
-                    Amount to pay
+                    Order status
                 </p>
 
-                <p className="mt-1 text-3xl font-bold">
-                    ₹{order.total}
+                <p className="mt-1 text-xl font-semibold">
+                    {getStatusMessage(order.status)}
                 </p>
-
-                <div className="mt-8">
-                    <p className="font-semibold">
-                        Pay using UPI
-                    </p>
-
-                    <p className="mt-2 text-sm text-gray-600">
-                        Scan the shop's UPI QR code or use the
-                        UPI payment button below.
-                    </p>
-                </div>
-
-                <div className="mt-6 rounded-lg bg-gray-100 p-4 text-center">
-                    <p className="text-sm text-gray-500">
-                        UPI ID
-                    </p>
-
-                    <p className="mt-1 font-mono font-semibold">
-                        {upiId}
-                    </p>
-                </div>
-
-                <a
-                    href={upiUrl}
-                    className="mt-6 block rounded bg-black px-4 py-3 text-center font-medium text-white"
-                >
-                    Pay ₹{order.total} with UPI
-                </a>
             </div>
 
-            <p className="mt-6 text-center text-sm text-gray-500">
-                After completing the payment, keep your order
-                number ready for the shop staff.
-            </p>
+            <div className="mt-6 rounded-lg border p-6">
+                <h2 className="text-lg font-semibold">
+                    Order details
+                </h2>
+
+                <div className="mt-4 space-y-3">
+                    {order.items.map((item) => (
+                        <div
+                            key={item.id}
+                            className="flex items-center justify-between"
+                        >
+                            <div>
+                                <p className="font-medium">
+                                    Product
+                                </p>
+
+                                <p className="text-sm text-gray-500">
+                                    Quantity: {item.quantity}
+                                </p>
+                            </div>
+
+                            <p className="font-medium">
+                                ₹{item.price}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-6 flex justify-between border-t pt-4">
+                    <span className="font-semibold">
+                        Total
+                    </span>
+
+                    <span className="text-xl font-bold">
+                        ₹{order.total}
+                    </span>
+                </div>
+            </div>
+
+            <div className="mt-6 rounded-lg bg-gray-100 p-6">
+                <p className="font-semibold">
+                    What happens next?
+                </p>
+
+                <p className="mt-2 text-sm text-gray-600">
+                    Keep your order number ready. The shop staff
+                    will verify your payment and prepare your order.
+                </p>
+            </div>
         </main>
     );
 }

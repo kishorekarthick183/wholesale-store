@@ -112,7 +112,7 @@ router.patch(
 router.post(
     "/:id/payment-submitted",
     asyncHandler(async (req, res) => {
-        const order = await submitPayment(req.params.id);
+        const order = await submitPayment(req.params.id as string);
 
         sendSuccess(res, order);
     }),
