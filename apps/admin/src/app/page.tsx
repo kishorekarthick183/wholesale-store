@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order } from "@/lib/api";
+import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order, updateOrderStatus, type OrderStatus } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -123,6 +123,28 @@ export default function Home() {
             setEditingId(null);
         } catch {
             setError("Failed to update product");
+        }
+    }
+
+    async function handleOrderStatusChange(
+        orderId: string,
+        status: OrderStatus,
+    ) {
+        try {
+            const updatedOrder = await updateOrderStatus(
+                orderId,
+                status,
+            );
+
+            setOrders((current) =>
+                current.map((order) =>
+                    order.id === orderId
+                        ? updatedOrder
+                        : order,
+                ),
+            );
+        } catch {
+            setError("Failed to update order status");
         }
     }
 
@@ -338,9 +360,23 @@ export default function Home() {
                                     </p>
                                 </div>
 
-                                <span className="font-semibold">
-                                    {order.status}
-                                </span>
+                                <select
+                                    value={order.status}
+                                    onChange={(event) =>
+                                        handleOrderStatusChange(
+                                            order.id,
+                                            event.target.value as OrderStatus,
+                                        )
+                                    }
+                                    className="rounded border px-3 py-1 font-medium"
+                                >
+                                    <option value="PENDING">Pending</option>
+                                    <option value="PAID">Paid</option>
+                                    <option value="PREPARING">Preparing</option>
+                                    <option value="READY">Ready</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                </select>
                             </div>
 
                             <div className="mt-4">

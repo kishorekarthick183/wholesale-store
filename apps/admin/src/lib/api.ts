@@ -103,3 +103,37 @@ export async function getOrders(): Promise<Order[]> {
 
     return result.data;
 }
+
+export type OrderStatus =
+    | "PENDING"
+    | "PAID"
+    | "PREPARING"
+    | "READY"
+    | "COMPLETED"
+    | "CANCELLED";
+
+export async function updateOrderStatus(
+    id: string,
+    status: OrderStatus,
+): Promise<Order> {
+    const response = await fetch(
+        `${API_URL}/orders/${id}/status`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                status,
+            }),
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to update order status");
+    }
+
+    const result: { data: Order } = await response.json();
+
+    return result.data;
+}
