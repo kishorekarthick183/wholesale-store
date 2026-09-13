@@ -119,6 +119,13 @@ export async function updateOrderStatus(
         throw new ApiError(404, "Order not found");
     }
 
+    if (!isValidStatusTransition(order.status, status)) {
+        throw new ApiError(
+            400,
+            `Cannot change order status from ${order.status} to ${status}`,
+        );
+    }
+
     return prisma.order.update({
         where: {
             id,
@@ -130,4 +137,20 @@ export async function updateOrderStatus(
             items: true,
         },
     });
+}
+
+function isValidStatusTransition(
+    current: string,
+    next: string,
+): boolean {
+    const transitions: Record<string, string[]> = {
+        PENDING: ["PAID", "CANCELLED"],
+        PAID: ["PREPARING", "CANCELLED"],
+        PREPARING: ["READY", "CANCELLED"],
+        READY: ["COMPLETED"],
+        COMPLETED: [],
+        CANCELLED: [],
+    };
+
+    return transitions[current]?.includes(next) ?? false;
 }
