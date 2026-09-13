@@ -53,7 +53,7 @@ router.put(
     }
 
     const product = await updateProduct(req.params.id as string, result.data);
-     sendSuccess(res, product);
+    sendSuccess(res, product);
   }),
 );
 

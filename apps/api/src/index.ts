@@ -10,10 +10,10 @@ const app = express();
 
 app.use(express.json());
 app.use(
-    cors({
-        origin: ["http://localhost:3000","http://localhost:3001"],
-        credentials: true,
-    }),
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+  }),
 );
 
 app.use("/health", healthRoutes);
@@ -23,5 +23,5 @@ app.use("/orders", orderRoutes);
 app.use(errorHandler);
 
 app.listen(4000, () => {
-    console.log("API running on http://localhost:4000");
+  console.log("API running on http://localhost:4000");
 });
