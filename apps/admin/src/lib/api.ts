@@ -16,6 +16,22 @@ export interface UpdateProductInput {
     stock: number;
 }
 
+export interface Order {
+    id: string;
+    name: string;
+    phone: string;
+    total: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    items: {
+        id: string;
+        productId: string;
+        quantity: number;
+        price: string;
+    }[];
+}
+
 export async function getProducts(): Promise<Product[]> {
     const response = await fetch(`${API_URL}/products`);
 
@@ -73,5 +89,17 @@ export async function updateProduct(
     }
 
     const result = await response.json();
+    return result.data;
+}
+
+export async function getOrders(): Promise<Order[]> {
+    const response = await fetch(`${API_URL}/orders`);
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch orders");
+    }
+
+    const result: { data: Order[] } = await response.json();
+
     return result.data;
 }
