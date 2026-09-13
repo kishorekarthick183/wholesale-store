@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order, verifyPayment, OrderStatus } from "@/lib/api";
+import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order, verifyPayment, type OrderStatus, updateOrderStatus } from "@/lib/api";
+
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -143,6 +144,19 @@ export default function Home() {
             );
         } catch {
             setError("Failed to update order status");
+        }
+    }
+    async function handleVerifyPayment(orderId: string) {
+        try {
+            const updatedOrder = await verifyPayment(orderId);
+
+            setOrders((currentOrders) =>
+                currentOrders.map((order) =>
+                    order.id === orderId ? updatedOrder : order,
+                ),
+            );
+        } catch {
+            alert("Failed to verify payment");
         }
     }
 
@@ -400,6 +414,15 @@ export default function Home() {
                                     ₹{order.total}
                                 </span>
                             </div>
+                            {order.status === "PAYMENT_SUBMITTED" && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleVerifyPayment(order.id)}
+                                    className="rounded bg-green-600 px-3 py-2 text-sm font-medium text-white"
+                                >
+                                    Verify Payment
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>
