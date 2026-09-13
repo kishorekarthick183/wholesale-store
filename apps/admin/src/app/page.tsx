@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Product } from "@wholesale/types";
-import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order, updateOrderStatus, type OrderStatus } from "@/lib/api";
+import { createProduct, getProducts, deleteProduct, updateProduct,  getOrders, type Order, verifyPayment, OrderStatus } from "@/lib/api";
 
 export default function Home() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -128,12 +128,10 @@ export default function Home() {
 
     async function handleOrderStatusChange(
         orderId: string,
-        status: OrderStatus,
     ) {
         try {
-            const updatedOrder = await updateOrderStatus(
+            const updatedOrder = await verifyPayment(
                 orderId,
-                status,
             );
 
             setOrders((current) =>
@@ -362,10 +360,9 @@ export default function Home() {
 
                                 <select
                                     value={order.status}
-                                    onChange={(event) =>
+                                    onChange={() =>
                                         handleOrderStatusChange(
                                             order.id,
-                                            event.target.value as OrderStatus,
                                         )
                                     }
                                     className="rounded border px-3 py-1 font-medium"
