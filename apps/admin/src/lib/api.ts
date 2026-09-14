@@ -31,8 +31,8 @@ export interface Order {
     quantity: number;
     price: string;
     product: {
-      name: string
-    }
+      name: string;
+    };
   }[];
 }
 

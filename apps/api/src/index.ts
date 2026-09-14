@@ -5,8 +5,12 @@ import { errorHandler } from "./middleware/error-handler.js";
 import productRoutes from "./routes/product.routes.js";
 import healthRoutes from "./routes/health.routes.js";
 import orderRoutes from "./routes/order.routes.js";
-import authRoutes from "./routes/auth.route.js";
+import authRoutes from "./routes/auth.routes.js";
 import cors from "cors";
+
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
 
 const app = express();
 

@@ -4,6 +4,9 @@ import type {
   CreateOrderInput,
   UpdateOrderStatusInput,
 } from "../validation/order.js";
+import { isValidStatusTransition } from "./order-status.js";
+
+export { isValidStatusTransition };
 
 export async function createOrder(data: CreateOrderInput) {
   return prisma.$transaction(async (tx) => {
@@ -147,20 +150,6 @@ export async function updateOrderStatus(
       items: true,
     },
   });
-}
-
-function isValidStatusTransition(current: string, next: string): boolean {
-  const transitions: Record<string, string[]> = {
-    PENDING: ["PAYMENT_SUBMITTED", "CANCELLED"],
-    PAYMENT_SUBMITTED: ["PAID", "CANCELLED"],
-    PAID: ["PREPARING"],
-    PREPARING: ["READY"],
-    READY: ["COMPLETED"],
-    COMPLETED: [],
-    CANCELLED: [],
-  };
-
-  return transitions[current]?.includes(next) ?? false;
 }
 
 export async function submitPayment(id: string) {

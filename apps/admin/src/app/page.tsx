@@ -149,7 +149,7 @@ export default function Home() {
       await deleteProduct(id);
 
       setProducts((current) => current.filter((product) => product.id !== id));
-    } catch (error) {
+    } catch {
       setError("Failed to delete product");
     }
   }
