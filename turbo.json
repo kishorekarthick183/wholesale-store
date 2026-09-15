@@ -8,10 +8,15 @@
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "env": ["JWT_SECRET", "NODE_ENV"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "env": ["JWT_SECRET", "NODE_ENV"]
     },
     "dev": {
       "cache": false,
