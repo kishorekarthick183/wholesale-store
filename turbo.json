@@ -9,7 +9,7 @@
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "env": ["JWT_SECRET", "NODE_ENV"]
+      "env": ["JWT_SECRET", "NODE_ENV", "WEB_URL", "ADMIN_URL", "PORT"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
